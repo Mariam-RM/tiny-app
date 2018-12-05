@@ -13,11 +13,21 @@
 
   <h1> URLS </h1>
   <ul>
+
     <% for (key in urls){ %>
-      <li><%= key %> : <%= urls[key] %> </li>
+      <li><%= key %> : <%= urls[key] %>
+      <form method="POST" action="/urls/<%=key%>/delete" style = "display:inline">
+
+      <button> delete </button>
+      <a href="urls/<%= key%>"> edit </a>
+
+      </form>
+       </li>
      <% } %>
-     <li href #>  </li>
+
+
   </ul>
+
 
 
     <!-- Add your EJS code here -->
