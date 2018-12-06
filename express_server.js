@@ -11,7 +11,17 @@ function generateRandomString() {
 
  let shorturl = randomString.substring(0,6);
  return shorturl
+};
+
+function isUserPresent(email){
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+    }
+  }
+  return false;
 }
+
 
 app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
@@ -73,7 +83,7 @@ app.get("/urls/register",(req,res) => {
 app.post("/urls", (req, res) => {
 
 
-  console.log(req.body);
+
   var shortKey = generateRandomString();
 
   urlDatabase[shortKey] = req.body.longURL;
@@ -149,15 +159,31 @@ app.post("/register", (req,res) =>{
   const password = req.body.password
   res.cookie("password",password);
 
-  var userID = generateRandomString();
+  const emailPresent = isUserPresent(email)
 
-  users[userID] = {userID};
-  users[userID].email = email
-  users[userID].password = password
+  const userID = generateRandomString();
+
+  console.log(users)
+
+  if (email === "" || password === ""){
+    res.send("error : 400 - Bad Request Error - invalid field entry");
+  } else if (emailPresent){
+    res.send("error : 400 - Bad Request Error - email already registered")
+  } else {
+      users[userID] = {userID};
+      users[userID].email = email
+      users[userID].password = password
+     res.redirect("/urls");
+  }
 
   console.log(users)
 
 
 
-  res.redirect("/urls");
 })
+
+// If the e-mail or password are empty strings, send back a response with the 400 status code.
+
+// If someone tries to register with an existing user's email, send back a response with the 400 status code.
+
+// Note: Storing users' passwords like this is very, very bad. Don't worry though, we'll fix this issue in a later exercise!
