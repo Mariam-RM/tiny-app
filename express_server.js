@@ -143,6 +143,21 @@ app.post("/logout", (req,res) =>{
 
 app.post("/register", (req,res) =>{
 
+ const email = req.body.email;
+ res.cookie("email",email);
+
+  const password = req.body.password
+  res.cookie("password",password);
+
+  var userID = generateRandomString();
+
+  users[userID] = {userID};
+  users[userID].email = email
+  users[userID].password = password
+
+  console.log(users)
+
+
 
   res.redirect("/urls");
 })
