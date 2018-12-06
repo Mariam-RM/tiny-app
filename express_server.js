@@ -22,17 +22,17 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
@@ -47,6 +47,15 @@ app.get("/urls/new", (req, res) => {
   };
   res.render("urls_new", templateVars);
 });
+
+
+app.get("/urls/register",(req,res) => {
+  let templateVars = { urls: urlDatabase,
+   username:req.cookies["username"]
+  };
+  res.render("urls_register", templateVars)
+});
+
 
 app.post("/urls", (req, res) => {
 
@@ -117,4 +126,10 @@ app.post("/logout", (req,res) =>{
   res.redirect("/urls");
 
 
+})
+
+app.post("/register", (req,res) =>{
+
+
+  res.redirect("/urls");
 })
