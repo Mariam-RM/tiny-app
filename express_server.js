@@ -13,7 +13,8 @@ function generateRandomString() {
  return shorturl
 };
 
-function isUserPresent(email){
+function isUserEmailPresent(email){
+
   for (const userId in users) {
     if (users[userId].email === email) {
       return users[userId];
@@ -21,6 +22,30 @@ function isUserPresent(email){
   }
   return false;
 }
+
+function isUserIDPresent(email){
+
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId].id;
+    }
+  }
+  return false;
+}
+
+
+// function findIDforEmail(email){
+//   for (userID in users){
+//     if(users[userID].email === email){
+//       let user_ID = users[userID]
+//       return user_ID;
+//     }
+//   }
+//   return false;
+// }
+
+
+
 
 
 app.set("view engine", "ejs");
@@ -144,8 +169,8 @@ app.post("/logout", (req,res) =>{
 
 
   const name = req.body.login
-  res.cookie("username",name);
-  res.clearCookie("username")
+  res.cookie("user_ID", users);
+  res.clearCookie("user_ID")
   res.redirect("/urls");
 
 
@@ -153,34 +178,91 @@ app.post("/logout", (req,res) =>{
 
 app.post("/register", (req,res) =>{
 
- const email = req.body.email;
- res.cookie("email",email);
+const email = req.body.email;
+const password = req.body.password;
 
-  const password = req.body.password
-  res.cookie("password",password);
+let user_id = generateRandomString();
+// let user_ID = isUserIDPresent(email)
 
-  const emailPresent = isUserPresent(email)
+res.cookie("user_id", user_id)
 
-  const userID = generateRandomString();
+ // const email = req.body.email;
+ // const password = req.body.password;
+ // const USER_ID = findIDforEmail(email)
+ // res.cookie("user_id", users[userID])
 
-  console.log(users)
+// res.cookie("email",email);
+// res.cookie("password",password);
+// var object = users[user_id]
 
-  if (email === "" || password === ""){
+
+
+  if ( email === "" || password === ""){
     res.send("error : 400 - Bad Request Error - invalid field entry");
-  } else if (emailPresent){
+  } else if (isUserEmailPresent(email)){
     res.send("error : 400 - Bad Request Error - email already registered")
   } else {
-      users[userID] = {userID};
-      users[userID].email = email
-      users[userID].password = password
+      let userObject = {
+      id : user_id,
+      email : email,
+      password: password
+      }
+      users[user_id] = userObject
      res.redirect("/urls");
-  }
+    }
+
 
   console.log(users)
-
-
-
 })
+
+
+
+
+
+
+// function isUserEmailPresent(email){
+
+//   for (const userId in users) {
+//     if (users[userId].email === email) {
+//       return users[userId];
+//     }
+//   }
+//   return false;
+// }
+
+// function isUserIDPresent(email){
+
+//   for (const userId in users) {
+//     if (users[userId].email === email) {
+//       return users[userId].id;
+//     }
+//   }
+//   return false;
+// }
+
+
+// app.post("/registration", (req, res) => {
+//  let templateVars = {
+//    aCookie: req.cookies['aCookie'],
+//    db: urlDatabase,
+//  };
+//  // add error check for duplicate email signup and response with 400 status
+
+//  if (duplicateEmailCheck((req.body.email).trim())){
+//    console.log(duplicateEmailCheck((req.body.email).trim()))
+//    res.status(400).send('400 Duplicate Email');
+//  }
+//  else {
+//    let tempID = uuidv4()
+//    users[tempID] = {
+//    id: tempID,
+//    email: (req.body.email).trim(),
+//    password: req.body.Password
+//  }
+//  res.cookie('aCookie', tempID);
+//  res.redirect('/urls');
+//  }
+// });
 
 // If the e-mail or password are empty strings, send back a response with the 400 status code.
 
