@@ -11,7 +11,67 @@ function generateRandomString() {
 
  let shorturl = randomString.substring(0,6);
  return shorturl
+};
+
+function isUserEmailPresent(email){
+
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+    }
+  }
+  return false;
 }
+
+function findUserID(email){
+
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+      // return users[userId].;
+    }
+  }
+  return false;
+}
+
+function isPasswordCorrect(email){
+
+
+  for (const userId in users){
+    if (users[userId].email === email){
+      return users[userId].password;
+    }
+
+  }
+  return false
+
+}
+
+
+
+// function findUserInfoByEmail(email){
+
+//   for (const userId in users){
+//     if(users[userID].email === email)
+//   }
+
+
+// }
+
+
+// function findIDforEmail(email){
+//   for (userID in users){
+//     if(users[userID].email === email){
+//       let user_ID = users[userID]
+//       return user_ID;
+//     }
+//   }
+//   return false;
+// }
+
+
+
+
 
 app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
@@ -22,36 +82,70 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
-   username:req.cookies["username"]
+   user_id:req.cookies["user_id"]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-  username:req.cookies["username"],
+  user_id:req.cookies["user_id"],
   };
   res.render("urls_new", templateVars);
 });
 
+
+app.get("/urls/register",(req,res) => {
+  let templateVars = { urls: urlDatabase,
+   user_id:req.cookies["user_id"]
+  };
+  res.render("urls_register", templateVars)
+});
+
+app.get("/urls/login", (req, res) =>{
+
+let templateVars = { urls: urlDatabase,
+   user_id:req.cookies["user_id"]
+  };
+
+
+  res.render("urls_login", templateVars);
+
+})
+
+
+
 app.post("/urls", (req, res) => {
 
 
-  console.log(req.body);
+
   var shortKey = generateRandomString();
 
   urlDatabase[shortKey] = req.body.longURL;
@@ -67,7 +161,7 @@ app.get("/urls/:id", (req, res) => {
   let longURL = urlDatabase[shortURL]
   let templateVars = { shortURL ,
     longURL,
-    username:req.cookies["username"]
+    user_id:req.cookies["user_id"]
   };
   res.render("urls_show", templateVars);
 });
@@ -98,12 +192,21 @@ app.post("/urls/:id", (req,res) => {
 
 app.post("/login", (req,res) =>{
 
+const email = req.body.email;
+const password = req.body.password;
 
-
-  const name = req.body.login
-  res.cookie("username",name);
-  res.redirect("/urls");
-
+if ( !isUserEmailPresent(email)){
+  res.send("Error 403 - User Not found")
+} else {
+  let checkpassword = isPasswordCorrect(email);
+  if (checkpassword !== password){
+    res.send("Error 403 - Password Incorrect");
+  } else {
+    user_id = findUserID(email);
+    res.cookie("user_id", user_id)
+    res.redirect("/urls");
+  }
+}
 
 })
 
@@ -111,10 +214,44 @@ app.post("/logout", (req,res) =>{
 
 
 
-  const name = req.body.login
-  res.cookie("username",name);
-  res.clearCookie("username")
+  const user_id = req.body.login
+  res.cookie("user_id", user_id);
+  res.clearCookie("user_id")
   res.redirect("/urls");
 
 
 })
+
+app.post("/register", (req,res) =>{
+
+const email = req.body.email;
+const password = req.body.password;
+
+let user_id = generateRandomString();
+
+
+res.cookie("user_id", user_id)
+
+
+  if ( email === "" || password === ""){
+    res.send("error : 400 - Bad Request Error - invalid field entry");
+  } else if (isUserEmailPresent(email)){
+    res.send("error : 400 - Bad Request Error - email already registered")
+  } else {
+      let userObject = {
+      id : user_id,
+      email : email,
+      password: password
+      }
+     users[user_id] = userObject;
+     res.redirect("/urls");
+    }
+
+
+  console.log(users)
+})
+
+
+
+
+
