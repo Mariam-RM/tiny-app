@@ -3,7 +3,7 @@
  <% if (user_id) { %>
   <form method="POST" action="/logout" >
    <input type="submit" value="logout">
-   currently signed in as: <%= user_id %>
+   currently signed in as: <%= user_id.email %>
   </form>
 <%  } else { %>
  <a href="/urls/register"> register </a>

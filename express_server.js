@@ -27,7 +27,7 @@ function findUserID(email){
 
   for (const userId in users) {
     if (users[userId].email === email) {
-      return users[userId].id;
+      return users[userId];
       // return users[userId].;
     }
   }
@@ -195,7 +195,6 @@ app.post("/login", (req,res) =>{
 const email = req.body.email;
 const password = req.body.password;
 
-
 if ( !isUserEmailPresent(email)){
   res.send("Error 403 - User Not found")
 } else {
@@ -244,7 +243,7 @@ res.cookie("user_id", user_id)
       email : email,
       password: password
       }
-      users[user_id] = userObject
+     users[user_id] = userObject;
      res.redirect("/urls");
     }
 
