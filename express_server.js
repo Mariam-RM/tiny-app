@@ -182,15 +182,26 @@ console.log(urlDatabase)
   res.redirect('http://localhost:8080/urls/' + shortKey);
 });
 
-// loaded url edit page
+// edit url (possibly still trying to figure it out)
 app.get("/urls/:id", (req, res) => {
-  let shortKey = req.params.id;
-  let longURL = urlDatabase[shortKey].longURL
-  let templateVars = { shortKey ,
+
+shortKey = req.params.id;
+longURL = urlDatabase[shortKey].longURL
+
+let templateVars = {shortKey,
     longURL,
     user_id:req.cookies["user_id"]
   };
+
+ if(!templateVars.user_id){
+    res.send("Error - can only edit if logged in");
+    // res.redirect("/urls/login")
+  } else {
+  let longURL = urlDatabase[shortKey].longURL
   res.render("urls_show", templateVars);
+  }
+
+
 });
 
 app.listen(PORT, () => {
@@ -206,18 +217,29 @@ app.get("/u/:shortURL", (req, res) => {
 // deletes resource
 app.post("/urls/:id/delete",(req,res) => {
  var shortKey = req.params.id;
+
  delete  urlDatabase[shortKey]; // let shortKey = urlDatabase[req.params.id]
  res.redirect("/urls")
 });
 
-// edit url
+// update url
 app.post("/urls/:id", (req,res) => {
-  const ID = req.params.id;
+  const shortKey = req.params.id;
   const LongURL = req.body.longURL;
 
-   urlDatabase[ID] = LongURL
+  let templateVars = { urls: urlDatabase,
+   user_id:req.cookies["user_id"]
+  };
 
-  res.redirect("/urls")
+   // urlDatabase[shortKey].longURL = LongURL;
+
+  if(!templateVars.user_id){
+    res.send("Error - can only update if logged in");
+    // res.redirect("/urls/login")
+  } else {
+    urlDatabase[shortKey].longURL = LongURL;
+    res.redirect("/urls");
+  }
 });
 
 app.post("/login", (req,res) =>{
