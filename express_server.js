@@ -77,10 +77,22 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+// var urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL :"http://www.lighthouselabs.ca",
+    id: 0
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    id: 0
+  }
 };
+
 
 const users = {
   "userRandomID": {
@@ -114,11 +126,18 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//make new urls
 app.get("/urls/new", (req, res) => {
   let templateVars = {
   user_id:req.cookies["user_id"],
   };
-  res.render("urls_new", templateVars);
+
+  if(!templateVars.user_id){
+    res.render("urls_login", templateVars);
+  } else {
+    res.render("urls_new", templateVars);
+  }
+
 });
 
 
@@ -141,25 +160,33 @@ let templateVars = { urls: urlDatabase,
 })
 
 
-
+//making new urls
 app.post("/urls", (req, res) => {
 
 
 
   var shortKey = generateRandomString();
 
-  urlDatabase[shortKey] = req.body.longURL;
 
+
+
+
+  urlDatabase[shortKey] = {
+    longURL: req.body.longURL,
+    id: req.cookies.user_id
+  };
+
+console.log(urlDatabase)
 
 
   res.redirect('http://localhost:8080/urls/' + shortKey);
 });
 
-
+// loaded url edit page
 app.get("/urls/:id", (req, res) => {
-  let shortURL = req.params.id;
-  let longURL = urlDatabase[shortURL]
-  let templateVars = { shortURL ,
+  let shortKey = req.params.id;
+  let longURL = urlDatabase[shortKey].longURL
+  let templateVars = { shortKey ,
     longURL,
     user_id:req.cookies["user_id"]
   };
@@ -170,17 +197,20 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+// goes to link short url points to
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL);
 });
 
+// deletes resource
 app.post("/urls/:id/delete",(req,res) => {
  var shortKey = req.params.id;
  delete  urlDatabase[shortKey]; // let shortKey = urlDatabase[req.params.id]
  res.redirect("/urls")
 });
 
+// edit url
 app.post("/urls/:id", (req,res) => {
   const ID = req.params.id;
   const LongURL = req.body.longURL;

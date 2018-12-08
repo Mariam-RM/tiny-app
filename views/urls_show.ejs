@@ -11,8 +11,8 @@
 
  <ul>
 
-      <li><%= shortURL %> : <%= longURL %> </li>
-      <form method="POST" action="/urls/<%= shortURL %>" >
+      <li><%= shortKey %> : <%= longURL %> </li>
+      <form method="POST" action="/urls/<%= shortKey %>" >
       <input id="longURL" type="text" name="longURL" <!-- placeholder=<%= longURL %> -->
       <input type="submit" value="Update">
     </form>
